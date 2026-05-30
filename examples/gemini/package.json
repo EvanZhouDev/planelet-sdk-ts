@@ -1,0 +1,14 @@
+{
+  "name": "planelet-gemini-example",
+  "version": "0.1.0",
+  "description": "Planelet plugin example using Google Gemini via the Vercel AI SDK.",
+  "type": "module",
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "dependencies": {
+    "planelet-sdk-ts": "latest",
+    "ai": "latest",
+    "@ai-sdk/google": "latest"
+  }
+}
