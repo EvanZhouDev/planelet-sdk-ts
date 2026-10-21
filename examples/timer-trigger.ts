@@ -21,7 +21,7 @@ const activeTimers = new Map<string, ReturnType<typeof setInterval>>();
 const superplane = createSuperPlaneClient({
   baseUrl: process.env.SUPERPLANE_BASE_URL ?? "http://localhost:8080",
   integrationId: process.env.SUPERPLANE_INTEGRATION_ID ?? "timer-demo",
-  token: process.env.SUPERPLANE_TOKEN,
+  ...(process.env.SUPERPLANE_TOKEN ? { token: process.env.SUPERPLANE_TOKEN } : {}),
 });
 
 const plugin = createPlugin({

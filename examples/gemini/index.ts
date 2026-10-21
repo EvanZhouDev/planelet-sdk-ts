@@ -48,8 +48,7 @@ const plugin = createPlugin({
         }
 
         const system =
-          typeof parameters.systemMessage === "string" &&
-          parameters.systemMessage.trim() !== ""
+          typeof parameters.systemMessage === "string" && parameters.systemMessage.trim() !== ""
             ? parameters.systemMessage.trim()
             : undefined;
 

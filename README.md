@@ -8,12 +8,30 @@ Build Planelet plugin servers that SuperPlane can call directly. The SDK is fetc
 bun add planelet-sdk-ts
 ```
 
-For local development in this repo:
+The SDK uses your runtime's TLS trust store for outbound events and example HTTP requests.
+Use Node.js 22.23.4+, 24.22.1+, or 26.12.1+ on the corresponding supported release line.
+Bun 1.3.14 still trusts the compromised eMudhra certificates. Use the verified patched
+Bun revision below until a stable fix is available. Custom `fetch` implementations
+must provide equivalent certificate validation.
+
+For local development in this repo, start with the patched Node version in `.node-version`
+and Python 3, then install the integrity-pinned Bun build:
 
 ```sh
-bun install
+node scripts/install-secure-bun.mjs "$PWD/.secure-bun"
+export PATH="$PWD/.secure-bun:$PATH"
+bun install --frozen-lockfile
 bun run check
+bun run build
+cd examples/gemini
+bun install --frozen-lockfile
+bun run typecheck
 ```
+
+The bootstrap verifies the official archive's SHA-256 and exact Bun revision
+`1.4.4-canary.1+963452075`. It supports macOS arm64 and Linux arm64/x64.
+The canary download URL is mutable, so a changed archive fails closed and requires
+a reviewed pin update. The Gemini example uses this local SDK build and pins its AI SDK dependencies.
 
 ## Bun server
 
@@ -74,7 +92,8 @@ const plugin = createPlugin({
 createNodeServer(plugin).listen(3000, "127.0.0.1");
 ```
 
-Node.js 18.17 or newer is required because the SDK uses the standard `Request`, `Response`, and `fetch` APIs.
+Node.js must satisfy `^22.23.4 || ^24.22.1 || >=26.12.1` for the eMudhra CA trust fix.
+The SDK uses the standard `Request`, `Response`, and `fetch` APIs.
 
 ## Webhook trigger
 
