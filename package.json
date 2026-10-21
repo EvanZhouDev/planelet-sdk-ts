@@ -19,8 +19,8 @@
   "files": ["dist", "README.md"],
   "sideEffects": false,
   "engines": {
-    "node": ">=18.17",
-    "bun": ">=1.0"
+    "node": "^22.23.4 || ^24.22.1 || >=26.12.1",
+    "bun": "1.4.4-canary.1"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -30,7 +30,8 @@
     "example:live": "bun run examples/planelet-live.ts",
     "test": "bun test",
     "test:node": "bun run build && node test/node-smoke.mjs",
-    "check": "bun run lint && bun run typecheck && bun test && bun run test:node"
+    "check": "bun run lint && bun run typecheck && bun test && bun run test:node && bun run test:client",
+    "test:client": "node test/client-http-smoke.mjs && bun test/client-http-smoke.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

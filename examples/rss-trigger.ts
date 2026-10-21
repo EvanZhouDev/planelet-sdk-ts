@@ -24,11 +24,9 @@ type FeedEntry = {
 
 function parseAtomFeed(xml: string): FeedEntry[] {
   const entries: FeedEntry[] = [];
-  const entryPattern = /<entry>([\s\S]*?)<\/entry>/g;
-  let match: RegExpExecArray | null;
-
-  while ((match = entryPattern.exec(xml)) !== null) {
-    const block = match[1];
+  const entryPattern = /<entry>[\s\S]*?<\/entry>/g;
+  for (let match = entryPattern.exec(xml); match !== null; match = entryPattern.exec(xml)) {
+    const block = match[0];
     const id = block.match(/<id>([^<]*)<\/id>/)?.[1] ?? "";
     const title = block.match(/<title[^>]*>([^<]*)<\/title>/)?.[1] ?? "";
     const link =
@@ -50,11 +48,9 @@ function parseAtomFeed(xml: string): FeedEntry[] {
 
 function parseRssFeed(xml: string): FeedEntry[] {
   const items: FeedEntry[] = [];
-  const itemPattern = /<item>([\s\S]*?)<\/item>/g;
-  let match: RegExpExecArray | null;
-
-  while ((match = itemPattern.exec(xml)) !== null) {
-    const block = match[1];
+  const itemPattern = /<item>[\s\S]*?<\/item>/g;
+  for (let match = itemPattern.exec(xml); match !== null; match = itemPattern.exec(xml)) {
+    const block = match[0];
     const title = block.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
     const link = block.match(/<link>([^<]*)<\/link>/)?.[1] ?? "";
     const guid = block.match(/<guid[^>]*>([^<]*)<\/guid>/)?.[1] ?? "";
@@ -80,7 +76,7 @@ const activeTimers = new Map<string, ReturnType<typeof setInterval>>();
 const superplane = createSuperPlaneClient({
   baseUrl: process.env.SUPERPLANE_BASE_URL ?? "http://localhost:8080",
   integrationId: process.env.SUPERPLANE_INTEGRATION_ID ?? "rss-demo",
-  token: process.env.SUPERPLANE_TOKEN,
+  ...(process.env.SUPERPLANE_TOKEN ? { token: process.env.SUPERPLANE_TOKEN } : {}),
 });
 
 const plugin = createPlugin({
@@ -115,9 +111,7 @@ const plugin = createPlugin({
             : "https://blog.cloudflare.com/rss/";
         const pollInterval = Math.max(
           10,
-          typeof parameters.pollIntervalSeconds === "number"
-            ? parameters.pollIntervalSeconds
-            : 300,
+          typeof parameters.pollIntervalSeconds === "number" ? parameters.pollIntervalSeconds : 300,
         );
         const pollIntervalMs = pollInterval * 1000;
 
