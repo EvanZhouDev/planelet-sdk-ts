@@ -14,6 +14,19 @@ Bun 1.3.14 still trusts the compromised eMudhra certificates. Use the verified p
 Bun revision below until a stable fix is available. Custom `fetch` implementations
 must provide equivalent certificate validation.
 
+Starting with 0.1.1, constructing `SuperPlaneClient` without `options.fetch` throws
+`SuperPlaneClientError` (status `0`) before any HTTP on unsupported Node or Bun.
+The Node ranges above are enforced, including rejection of older odd release lines.
+Bun support fails closed: only version `1.4.4` with full revision
+`963452075e9d7e2a47a482f297143af5ed4f76c0` is currently accepted. The canary's
+`Bun.version` reports `1.4.4`; its CLI reports `1.4.4-canary.1+963452075`.
+Future Bun builds require a reviewed support update, even if their version is newer.
+An explicitly supplied `options.fetch` bypasses this runtime check: its TLS security
+is the caller's responsibility. Browsers and other platforms without Node/Bun runtime
+markers use their platform's fetch and trust store; this guard does not certify those
+stores. The SDK does not change process-wide TLS settings. Inbound plugin handlers
+and the Node server adapter do not construct an outbound client and remain unaffected.
+
 For local development in this repo, start with the patched Node version in `.node-version`
 and Python 3, then install the integrity-pinned Bun build:
 

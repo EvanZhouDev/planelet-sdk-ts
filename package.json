@@ -1,6 +1,6 @@
 {
   "name": "planelet-sdk-ts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript SDK for building SuperPlane Planelet Plugin servers.",
   "type": "module",
   "main": "./dist/index.js",
@@ -31,7 +31,7 @@
     "test": "bun test",
     "test:node": "bun run build && node test/node-smoke.mjs",
     "check": "bun run lint && bun run typecheck && bun test && bun run test:node && bun run test:client",
-    "test:client": "node test/client-http-smoke.mjs && bun test/client-http-smoke.mjs"
+    "test:client": "node test/client-http-smoke.mjs && bun test/client-http-smoke.mjs && node --experimental-vm-modules test/client-runtime-smoke.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

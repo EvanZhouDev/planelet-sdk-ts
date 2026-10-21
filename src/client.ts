@@ -30,6 +30,10 @@ export class SuperPlaneClient {
   readonly fetch: FetchLike;
 
   constructor(options: SuperPlaneClientOptions) {
+    if (options.fetch === undefined || options.fetch === null) {
+      assertDefaultFetchRuntime();
+    }
+
     const fetchImplementation = options.fetch ?? globalThis.fetch;
 
     if (!fetchImplementation) {
@@ -78,6 +82,51 @@ export class SuperPlaneClient {
 
 export function createSuperPlaneClient(options: SuperPlaneClientOptions): SuperPlaneClient {
   return new SuperPlaneClient(options);
+}
+
+function assertDefaultFetchRuntime(): void {
+  const runtime = globalThis;
+  if ("Bun" in runtime) {
+    const bun = runtime.Bun;
+    if (
+      typeof bun === "object" &&
+      bun !== null &&
+      "version" in bun &&
+      bun.version === "1.4.4" &&
+      "revision" in bun &&
+      bun.revision === "963452075e9d7e2a47a482f297143af5ed4f76c0"
+    ) {
+      return;
+    }
+    throw new SuperPlaneClientError(
+      "Default fetch requires verified Bun revision 963452075e9d7e2a47a482f297143af5ed4f76c0; upgrade Bun or supply a fetch with equivalent TLS validation",
+      { status: 0, responseBody: "" },
+    );
+  }
+
+  if (typeof process === "undefined" || !process.versions?.node) {
+    return;
+  }
+
+  const version = /^(\d+)\.(\d+)\.(\d+)$/.exec(process.versions.node);
+  if (version) {
+    const major = Number(version[1]);
+    const minor = Number(version[2]);
+    const patch = Number(version[3]);
+    if (
+      (major === 22 && (minor > 23 || (minor === 23 && patch >= 4))) ||
+      (major === 24 && (minor > 22 || (minor === 22 && patch >= 1))) ||
+      (major === 26 && (minor > 12 || (minor === 12 && patch >= 1))) ||
+      major > 26
+    ) {
+      return;
+    }
+  }
+
+  throw new SuperPlaneClientError(
+    "Default fetch requires Node.js ^22.23.4 || ^24.22.1 || >=26.12.1; upgrade Node.js or supply a fetch with equivalent TLS validation",
+    { status: 0, responseBody: "" },
+  );
 }
 
 function appendPath(baseUrl: URL, path: string): URL {
